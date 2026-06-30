@@ -16,8 +16,34 @@ export function fromIso(iso: string): Date {
   return new Date(y, m - 1, d);
 }
 
+export function getISTDate(d: Date = new Date()): Date {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(d);
+  const partMap: Record<string, string> = {};
+  for (const part of parts) {
+    partMap[part.type] = part.value;
+  }
+  return new Date(
+    Number(partMap.year),
+    Number(partMap.month) - 1,
+    Number(partMap.day),
+    Number(partMap.hour) === 24 ? 0 : Number(partMap.hour),
+    Number(partMap.minute),
+    Number(partMap.second)
+  );
+}
+
 export function todayIso(): string {
-  return toIso(new Date());
+  return toIso(getISTDate());
 }
 
 const MONTHS = [
@@ -112,6 +138,6 @@ export function workedDuration(inT: string, outT: string): string {
 
 /** Current clock time as HH:MM. */
 export function nowTime(): string {
-  const d = new Date();
+  const d = getISTDate();
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }

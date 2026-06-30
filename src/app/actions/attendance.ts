@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { dbConnect } from "@/lib/mongodb";
 import { Attendance } from "@/models";
 import { requireUser } from "@/lib/session";
-import { todayIso, nowTime } from "@/lib/dates";
+import { todayIso, nowTime, getISTDate } from "@/lib/dates";
 import { LATE_THRESHOLD_HOUR } from "@/lib/constants";
 
 export interface ActionResult {
@@ -31,7 +31,7 @@ export async function checkInAction(): Promise<ActionResult> {
       date,
       checkIn: time,
       checkOut: "",
-      status: new Date().getHours() >= LATE_THRESHOLD_HOUR ? "Late" : "Present",
+      status: getISTDate().getHours() >= LATE_THRESHOLD_HOUR ? "Late" : "Present",
     });
   } else {
     existing.checkIn = time;
